@@ -7,7 +7,7 @@ const markdownOutput = document.getElementById('markdown-output');
 const downloadBtn = document.getElementById('download-btn');
 
 // IMPORTANT: Replace this with the URL of your deployed backend function
-const BACKEND_URL = 'https://your-backend-service.vercel.app/api/process';
+const BACKEND_URL = 'https://vercel.com/philonoist/backend-easy-ocr/api/process';
 
 // --- Event Listeners ---
 uploadArea.addEventListener('click', () => pdfUpload.click());
