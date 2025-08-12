@@ -17,16 +17,16 @@
         <header>
             <i class="fa-solid fa-file-invoice header-icon"></i>
             <h1>EasyOCR</h1>
-            <p>AI-Powered Arabic Document Editor</p>
+            <p>AI-Powered Document & Image Editor</p>
         </header>
 
         <main>
-            <!-- 1. UPLOAD SECTION -->
+              <!-- 1. UPLOAD SECTION -->
             <div id="upload-section">
                 <div class="upload-area" id="upload-area">
-                    <input type="file" id="pdf-upload" accept="application/pdf" hidden>
+                    <input type="file" id="pdf-upload" accept="application/pdf,image/png,image/jpeg" hidden>
                     <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                    <p>Drag & Drop your PDF file here or <strong>Click to Upload</strong></p>
+                    <p>Drag & Drop your PDF or Image file here or <strong>Click to Upload</strong></p>
                 </div>
                 <div class="limitations">
                     <p><strong>Free Version Limits:</strong> Max file size ~4.5 MB.</p>
@@ -44,9 +44,11 @@
 
             <!-- 2. STATUS AREA -->
             <div class="status-area" id="status-area" style="display: none;">
-                <div class="loader"></div>
+                <div class="loader" id="loader"></div>
                 <p id="status-text">Processing your document...</p>
                 <p class="timer" id="timer">00:00</p>
+                <!-- "Try Again" button, hidden by default -->
+                <button id="try-again-btn" class="secondary-action-btn" style="display: none;"><i class="fa-solid fa-rotate"></i> Try Again</button>
             </div>
             
             <!-- 3. RESULT AREA -->
@@ -54,11 +56,9 @@
                 <h2><i class="fa-solid fa-file-export"></i> Extracted Text</h2>
                 <textarea id="markdown-output" readonly></textarea>
                 <div class="download-options">
-                    <!-- Only Markdown download button, styled for polish and mobile -->
-                    <button class="download-btn download-md-polished" id="download-md">
-                        <i class="fa-brands fa-markdown"></i>
-                        <span>Download as Markdown (.md)</span>
-                    </button>
+                    <button class="download-btn" id="download-md"><i class="fa-brands fa-markdown"></i> Markdown</button>
+                    <button class="download-btn" id="download-docx"><i class="fa-solid fa-file-word"></i> Word</button>
+                    <button class="download-btn" id="download-pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                 </div>
                 <button id="reload-btn" class="secondary-action-btn"><i class="fa-solid fa-rotate-right"></i> Process Another File</button>
             </div>
@@ -67,9 +67,8 @@
         <!-- Support the Project Section -->
         <div class="support-section">
             <h3>Support the Project</h3>
-            <p>Help support its development and cover server costs for unlocking the limitations for everyone. 
-                You can send Money to this Mastercard ID:</p>
-                
+            <p>Help support its development and cover server costs for unlocking the limitations for everyone.</p>
+            <p>If you want to support me, send a Money to this Mastercard ID:</p>
             <div class="support-id-wrapper">
                 <input type="text" id="support-id" value="7111590548" readonly>
                 <button id="copy-id-btn"><i class="fa-solid fa-copy"></i> Copy</button>
