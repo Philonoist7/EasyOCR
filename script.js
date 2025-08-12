@@ -15,8 +15,10 @@ const fileWarning = document.getElementById('file-warning');
 const processBtn = document.getElementById('process-btn');
 
 const statusArea = document.getElementById('status-area');
+const loader = document.getElementById('loader');
 const statusText = document.getElementById('status-text');
 const timerDisplay = document.getElementById('timer');
+const tryAgainBtn = document.getElementById('try-again-btn');
 
 const resultArea = document.getElementById('result-area');
 const markdownOutput = document.getElementById('markdown-output');
@@ -40,9 +42,15 @@ pdfUpload.addEventListener('change', handleFileSelect);
 processBtn.addEventListener('click', processFile);
 reloadBtn.addEventListener('click', () => location.reload());
 copyIdBtn.addEventListener('click', copySupportId);
+tryAgainBtn.addEventListener('click', () => {
+    // Reset to the file info screen to allow reprocessing
+    statusArea.style.display = 'none';
+    uploadSection.style.display = 'block';
+    fileInfo.style.display = 'block';
+});
 
 uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('active'); });
-uploadArea.addEventListener('dragleave', (e) => { e.preventDefault(); e.currentTarget.classList.remove('active'); });
+uploadArea.addEventListener('dragleave', (e) => { e.currentTarget.classList.remove('active'); });
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     e.currentTarget.classList.remove('active');
@@ -56,10 +64,10 @@ function handleFileSelect(event) {
 }
 
 // --- CORE LOGIC ---
-
 async function handleFile(file) {
-    if (file.type !== 'application/pdf') {
-        alert('Please upload a PDF file.');
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a valid file type: PDF, PNG, or JPG.');
         return;
     }
     currentFile = file;
@@ -70,33 +78,41 @@ async function handleFile(file) {
     fileName.textContent = file.name;
     const sizeInMB = file.size / 1024 / 1024;
     fileSize.textContent = `${sizeInMB.toFixed(2)} MB`;
-    filePages.textContent = '...counting';
-
+    
     fileWarning.style.display = sizeInMB > FREE_TIER_LIMIT_MB ? 'flex' : 'none';
 
-    try {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onload = async function() {
-            const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-            filePages.textContent = pdf.numPages;
-        };
-    } catch (error) {
-        console.error("Error counting pages:", error);
-        filePages.textContent = 'N/A';
+    if (file.type === 'application/pdf') {
+        filePages.textContent = '...counting';
+        try {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = async function() {
+                const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                filePages.textContent = pdf.numPages;
+            };
+        } catch (error) {
+            console.error("Error counting PDF pages:", error);
+            filePages.textContent = 'N/A';
+        }
+    } else {
+        filePages.textContent = '1';
     }
 }
 
 async function processFile() {
     if (!currentFile) return;
 
+    // Reset UI for processing
     uploadSection.style.display = 'none';
     statusArea.style.display = 'block';
     statusText.innerText = 'Processing your document...';
+    loader.style.display = 'block';
+    timerDisplay.style.display = 'block';
+    tryAgainBtn.style.display = 'none';
     startTimer();
 
     const formData = new FormData();
-    formData.append('pdf_file', currentFile);
+    formData.append('file', currentFile);
 
     try {
         const response = await fetch(BACKEND_URL, { method: 'POST', body: formData });
@@ -111,16 +127,23 @@ async function processFile() {
         statusArea.style.display = 'none';
         resultArea.style.display = 'block';
         setupDownloadListeners(data.markdown_content, currentFile.name);
+
     } catch (error) {
         console.error('Error:', error);
-        stopTimer();
-        statusText.innerText = `An error occurred: ${error.message}`;
-        timerDisplay.style.display = 'none';
+        handleProcessingError(error.message);
     }
 }
 
-// --- HELPER FUNCTIONS ---
+function handleProcessingError(errorMessage) {
+    stopTimer();
+    statusText.innerText = `An error occurred: ${errorMessage}`;
+    // Hide loader and timer, show "Try Again" button
+    loader.style.display = 'none';
+    timerDisplay.style.display = 'none';
+    tryAgainBtn.style.display = 'inline-flex';
+}
 
+// --- HELPER FUNCTIONS ---
 function startTimer() {
     let seconds = 0;
     timerDisplay.textContent = '00:00';
@@ -139,7 +162,6 @@ function stopTimer() {
 function copySupportId() {
     supportIdInput.select();
     document.execCommand('copy');
-    // Provide user feedback
     const originalText = copyIdBtn.innerHTML;
     copyIdBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
     setTimeout(() => {
@@ -148,10 +170,10 @@ function copySupportId() {
 }
 
 function setupDownloadListeners(markdownContent, originalFileName) {
-    const baseName = originalFileName.replace(/\.pdf$/i, '');
+    const baseName = originalFileName.replace(/\.(pdf|png|jpeg|jpg)$/i, '');
     const { jsPDF } = window.jspdf;
 
-    downloadMdBtn.onclick = () => downloadAsText(markdownContent, `${baseName}.md`, 'text/markdown');
+    downloadMdBtn.onclick = () => downloadAsText(markdownContent, `${baseName}.md`);
     
     downloadDocxBtn.onclick = async () => {
         const htmlContent = markdownContent.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, '<br/>');
@@ -161,7 +183,9 @@ function setupDownloadListeners(markdownContent, originalFileName) {
 
     downloadPdfBtn.onclick = () => {
         const doc = new jsPDF();
-        doc.setFont('Helvetica');
+        // For better Arabic support, a custom font needs to be embedded.
+        // This is a complex task in jsPDF. Using a standard font for now.
+        doc.setFont('Helvetica', 'normal');
         doc.setR2L(true);
         const lines = doc.splitTextToSize(markdownContent, 180);
         doc.text(lines, 200, 10, { align: 'right' });
