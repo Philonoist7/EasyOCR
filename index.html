@@ -2,38 +2,80 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mistral OCR - Arabic Document Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EasyOCR - AI-Powered Arabic Document Editor</title>
     <link rel="stylesheet" href="style.css">
+    <!-- FONT AWESOME for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Import libraries for advanced functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/html-to-docx@1.8.0/dist/html-to-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📖 Mistral OCR</h1>
+            <i class="fa-solid fa-file-invoice header-icon"></i>
+            <h1>EasyOCR</h1>
             <p>AI-Powered Arabic Document Editor</p>
         </header>
 
         <main>
-            <div class="upload-area" id="upload-area">
-                <input type="file" id="pdf-upload" accept="application/pdf" hidden>
-                <img src="https://img.icons8.com/plasticine/100/000000/upload--v1.png" alt="Upload Icon"/>
-                <p>Drag & Drop your PDF file here or <strong>Click to Upload</strong></p>
+            <!-- 1. UPLOAD SECTION -->
+            <div id="upload-section">
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="pdf-upload" accept="application/pdf" hidden>
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <p>Drag & Drop your PDF file here or <strong>Click to Upload</strong></p>
+                </div>
+                <div class="limitations">
+                    <p><strong>Free Version Limits:</strong> Max file size ~4.5 MB (approx. 10-30 pages).</p>
+                </div>
+                <div class="file-info" id="file-info" style="display: none;">
+                    <p><i class="fa-solid fa-file"></i> <strong>File:</strong> <span id="file-name"></span></p>
+                    <p><i class="fa-solid fa-weight-scale"></i> <strong>Size:</strong> <span id="file-size"></span></p>
+                    <p><i class="fa-solid fa-file-lines"></i> <strong>Pages:</strong> <span id="file-pages"></span></p>
+                    <div class="warning" id="file-warning" style="display: none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> This file exceeds free limits and may fail.
+                    </div>
+                    <button id="process-btn" class="main-action-btn"><i class="fa-solid fa-gear"></i> Process File</button>
+                </div>
             </div>
 
+            <!-- 2. STATUS AREA -->
             <div class="status-area" id="status-area" style="display: none;">
                 <div class="loader"></div>
-                <p id="status-text">Uploading and processing your document...</p>
+                <p id="status-text">Processing your document...</p>
+                <p class="timer" id="timer">00:00</p>
             </div>
             
+            <!-- 3. RESULT AREA -->
             <div class="result-area" id="result-area" style="display: none;">
-                <h2>Extracted Text (Markdown)</h2>
+                <h2><i class="fa-solid fa-file-export"></i> Extracted Text</h2>
                 <textarea id="markdown-output" readonly></textarea>
-                <button id="download-btn">Download as Markdown (.md)</button>
+                <div class="download-options">
+                    <button class="download-btn" id="download-md"><i class="fa-brands fa-markdown"></i> Markdown (.md)</button>
+                    <button class="download-btn" id="download-docx"><i class="fa-solid fa-file-word"></i> Word (.docx)</button>
+                    <button class="download-btn" id="download-pdf"><i class="fa-solid fa-file-pdf"></i> PDF (.pdf)</button>
+                </div>
+                <button id="reload-btn" class="secondary-action-btn"><i class="fa-solid fa-rotate-right"></i> Process Another File</button>
             </div>
         </main>
 
+        <!-- Support the Project Section -->
+        <div class="support-section">
+            <h3>Support the Project</h3>
+            <p>Help support its development and cover server costs for unlocking the limitations for everyone. 
+                You can send Money to this Mastercard ID:</p>
+                
+            <div class="support-id-wrapper">
+                <input type="text" id="support-id" value="7111590548" readonly>
+                <button id="copy-id-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+        </div>
+
         <footer>
-            <p>Powered by Mistral AI | Project from <a href="https://github.com/Pythonation/Mistral-Arabic-OCR-test" target="_blank">Pythonation</a></p>
+            <p>Developed by <a href="https://github.com/Philonoist7" target="_blank">Ali Hussein</a> | API provided by <a href="https://github.com/Pythonation" target="_blank">Pythonation</a></p>
         </footer>
     </div>
     <script src="script.js"></script>
