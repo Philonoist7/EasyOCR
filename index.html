@@ -54,9 +54,11 @@
                 <h2><i class="fa-solid fa-file-export"></i> Extracted Text</h2>
                 <textarea id="markdown-output" readonly></textarea>
                 <div class="download-options">
-                    <button class="download-btn" id="download-md"><i class="fa-brands fa-markdown"></i> Markdown (.md)</button>
-                    <button class="download-btn" id="download-docx"><i class="fa-solid fa-file-word"></i> Word (.docx)</button>
-                    <button class="download-btn" id="download-pdf"><i class="fa-solid fa-file-pdf"></i> PDF (.pdf)</button>
+                    <!-- Only Markdown download button, styled for polish and mobile -->
+                    <button class="download-btn download-md-polished" id="download-md">
+                        <i class="fa-brands fa-markdown"></i>
+                        <span>Download as Markdown (.md)</span>
+                    </button>
                 </div>
                 <button id="reload-btn" class="secondary-action-btn"><i class="fa-solid fa-rotate-right"></i> Process Another File</button>
             </div>
