@@ -187,6 +187,38 @@ header p {
 }
 .download-btn:hover { background-color: var(--success-hover); transform: translateY(-2px); }
 
+.download-md-polished {
+    background: linear-gradient(90deg, #007AFF 0%, #00C6FB 100%);
+    color: #fff;
+    border: none;
+    padding: 16px 0;
+    border-radius: 12px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    box-shadow: 0 4px 16px 0 rgba(0,122,255,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    transition: background 0.2s, transform 0.2s;
+}
+.download-md-polished:hover,
+.download-md-polished:focus {
+    background: linear-gradient(90deg, #0056b3 0%, #007AFF 100%);
+    transform: translateY(-2px) scale(1.02);
+    outline: none;
+}
+@media (max-width: 600px) {
+    .download-md-polished {
+        font-size: 1rem;
+        padding: 14px 0;
+        max-width: 100%;
+    }
+}
+
 #reload-btn { width: auto; margin-top: 1.5rem; }
 
 .support-section {
