@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral OCR - Arabic Document Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Mistral OCR</h1>
+            <p>AI-Powered Arabic Document Editor</p>
+        </header>
+
+        <main>
+            <div class="upload-area" id="upload-area">
+                <input type="file" id="pdf-upload" accept="application/pdf" hidden>
+                <img src="https://img.icons8.com/plasticine/100/000000/upload--v1.png" alt="Upload Icon"/>
+                <p>Drag & Drop your PDF file here or <strong>Click to Upload</strong></p>
+            </div>
+
+            <div class="status-area" id="status-area" style="display: none;">
+                <div class="loader"></div>
+                <p id="status-text">Uploading and processing your document...</p>
+            </div>
+            
+            <div class="result-area" id="result-area" style="display: none;">
+                <h2>Extracted Text (Markdown)</h2>
+                <textarea id="markdown-output" readonly></textarea>
+                <button id="download-btn">Download as Markdown (.md)</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Mistral AI | Project from <a href="https://github.com/Pythonation/Mistral-Arabic-OCR-test" target="_blank">Pythonation</a></p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
