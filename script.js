@@ -6,27 +6,23 @@ const FREE_TIER_LIMIT_MB = 4.5;
 const uploadSection = document.getElementById('upload-section');
 const uploadArea = document.getElementById('upload-area');
 const pdfUpload = document.getElementById('pdf-upload');
-
 const fileInfo = document.getElementById('file-info');
 const fileName = document.getElementById('file-name');
 const fileSize = document.getElementById('file-size');
 const filePages = document.getElementById('file-pages');
 const fileWarning = document.getElementById('file-warning');
 const processBtn = document.getElementById('process-btn');
-
 const statusArea = document.getElementById('status-area');
 const loader = document.getElementById('loader');
 const statusText = document.getElementById('status-text');
 const timerDisplay = document.getElementById('timer');
 const tryAgainBtn = document.getElementById('try-again-btn');
-
 const resultArea = document.getElementById('result-area');
 const markdownOutput = document.getElementById('markdown-output');
 const downloadMdBtn = document.getElementById('download-md');
 const downloadDocxBtn = document.getElementById('download-docx');
 const downloadPdfBtn = document.getElementById('download-pdf');
 const reloadBtn = document.getElementById('reload-btn');
-
 const copyIdBtn = document.getElementById('copy-id-btn');
 const supportIdInput = document.getElementById('support-id');
 
@@ -43,7 +39,6 @@ processBtn.addEventListener('click', processFile);
 reloadBtn.addEventListener('click', () => location.reload());
 copyIdBtn.addEventListener('click', copySupportId);
 tryAgainBtn.addEventListener('click', () => {
-    // Reset to the file info screen to allow reprocessing
     statusArea.style.display = 'none';
     uploadSection.style.display = 'block';
     fileInfo.style.display = 'block';
@@ -65,9 +60,9 @@ function handleFileSelect(event) {
 
 // --- CORE LOGIC ---
 async function handleFile(file) {
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
-    if (!allowedTypes.includes(file.type)) {
-        alert('Please upload a valid file type: PDF, PNG, or JPG.');
+    // UPDATED: Simplified check for PDF only
+    if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file.');
         return;
     }
     currentFile = file;
@@ -81,28 +76,24 @@ async function handleFile(file) {
     
     fileWarning.style.display = sizeInMB > FREE_TIER_LIMIT_MB ? 'flex' : 'none';
 
-    if (file.type === 'application/pdf') {
-        filePages.textContent = '...counting';
-        try {
-            const reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onload = async function() {
-                const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-                filePages.textContent = pdf.numPages;
-            };
-        } catch (error) {
-            console.error("Error counting PDF pages:", error);
-            filePages.textContent = 'N/A';
-        }
-    } else {
-        filePages.textContent = '1';
+    // UPDATED: No need for an if/else, as it's always a PDF
+    filePages.textContent = '...counting';
+    try {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = async function() {
+            const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+            filePages.textContent = pdf.numPages;
+        };
+    } catch (error) {
+        console.error("Error counting PDF pages:", error);
+        filePages.textContent = 'N/A';
     }
 }
 
 async function processFile() {
     if (!currentFile) return;
 
-    // Reset UI for processing
     uploadSection.style.display = 'none';
     statusArea.style.display = 'block';
     statusText.innerText = 'Processing your document...';
@@ -112,7 +103,7 @@ async function processFile() {
     startTimer();
 
     const formData = new FormData();
-    formData.append('file', currentFile);
+    formData.append('pdf_file', currentFile); // Renamed for clarity
 
     try {
         const response = await fetch(BACKEND_URL, { method: 'POST', body: formData });
@@ -137,7 +128,6 @@ async function processFile() {
 function handleProcessingError(errorMessage) {
     stopTimer();
     statusText.innerText = `An error occurred: ${errorMessage}`;
-    // Hide loader and timer, show "Try Again" button
     loader.style.display = 'none';
     timerDisplay.style.display = 'none';
     tryAgainBtn.style.display = 'inline-flex';
@@ -170,7 +160,8 @@ function copySupportId() {
 }
 
 function setupDownloadListeners(markdownContent, originalFileName) {
-    const baseName = originalFileName.replace(/\.(pdf|png|jpeg|jpg)$/i, '');
+    // UPDATED: Simplified regex for PDF only
+    const baseName = originalFileName.replace(/\.pdf$/i, '');
     const { jsPDF } = window.jspdf;
 
     downloadMdBtn.onclick = () => downloadAsText(markdownContent, `${baseName}.md`);
@@ -183,8 +174,6 @@ function setupDownloadListeners(markdownContent, originalFileName) {
 
     downloadPdfBtn.onclick = () => {
         const doc = new jsPDF();
-        // For better Arabic support, a custom font needs to be embedded.
-        // This is a complex task in jsPDF. Using a standard font for now.
         doc.setFont('Helvetica', 'normal');
         doc.setR2L(true);
         const lines = doc.splitTextToSize(markdownContent, 180);
