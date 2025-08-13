@@ -20,8 +20,7 @@ const tryAgainBtn = document.getElementById('try-again-btn');
 const resultArea = document.getElementById('result-area');
 const markdownOutput = document.getElementById('markdown-output');
 const downloadMdBtn = document.getElementById('download-md');
-const downloadDocxBtn = document.getElementById('download-docx');
-const downloadPdfBtn = document.getElementById('download-pdf');
+const downloadTxtBtn = document.getElementById('download-txt');
 const reloadBtn = document.getElementById('reload-btn');
 const copyIdBtn = document.getElementById('copy-id-btn');
 const supportIdInput = document.getElementById('support-id');
@@ -160,26 +159,11 @@ function copySupportId() {
 }
 
 function setupDownloadListeners(markdownContent, originalFileName) {
-    // UPDATED: Simplified regex for PDF only
     const baseName = originalFileName.replace(/\.pdf$/i, '');
-    const { jsPDF } = window.jspdf;
 
     downloadMdBtn.onclick = () => downloadAsText(markdownContent, `${baseName}.md`);
-    
-    downloadDocxBtn.onclick = async () => {
-        const htmlContent = markdownContent.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, '<br/>');
-        const fileBuffer = await htmlToDocx.asBlob(`<div dir="rtl">${htmlContent}</div>`);
-        downloadAsBlob(fileBuffer, `${baseName}.docx`);
-    };
-
-    downloadPdfBtn.onclick = () => {
-        const doc = new jsPDF();
-        doc.setFont('Helvetica', 'normal');
-        doc.setR2L(true);
-        const lines = doc.splitTextToSize(markdownContent, 180);
-        doc.text(lines, 200, 10, { align: 'right' });
-        doc.save(`${baseName}_converted.pdf`);
-    };
+    downloadTxtBtn.onclick = () => downloadAsText(markdownContent, `${baseName}.txt`);
+    // Removed DOCX and PDF download logic
 }
 
 function downloadAsText(content, fileName) {
